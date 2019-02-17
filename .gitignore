@@ -1,2 +1,5 @@
 .idea/
 *.txt
+!requirements.txt
+.python-version
+.DS_store
