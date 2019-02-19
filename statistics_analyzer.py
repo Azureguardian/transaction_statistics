@@ -98,23 +98,25 @@ class StatisticAnalyzer(object):
             for event in self.event_types:
                 file.write('Results for EVENTNAME: %s\n\n' % event)
 
-                file.write('%s min=%s, 50%%=%s, 90%%=%s 99%%=%s 99.9%%=%s\n' % (
-                    self.event_stats[event].eventname,
-                    self.event_stats[event].min,
-                    self.event_stats[event].median,
-                    self.event_stats[event].ninety,
-                    self.event_stats[event].ninety_nine,
-                    self.event_stats[event].ninety_nine_dot_nine
-                ))
+                file.write('%s min=%s, 50%%=%s, 90%%=%s 99%%=%s 99.9%%=%s\n'
+                           % (
+                               self.event_stats[event].eventname,
+                               self.event_stats[event].min,
+                               self.event_stats[event].median,
+                               self.event_stats[event].ninety,
+                               self.event_stats[event].ninety_nine,
+                               self.event_stats[event].ninety_nine_dot_nine
+                           ))
 
                 table = BeautifulTable()
                 table.set_style(BeautifulTable.STYLE_BOX)
+                step = 5
                 table.numeric_precision = 5
                 table.column_headers = results_table_headers
                 for header in results_table_headers:
                     table.column_alignments[header] = BeautifulTable.ALIGN_RIGHT
                 for response_time in range(
-                        0, self.event_types[event][-1] + 5, 5):
+                        0, self.event_types[event][-1] + step, step):
                     count = self.event_types[event].count(response_time)
                     if count != 0:
                         # скорее всего, под значением в последнем столбце
