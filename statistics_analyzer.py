@@ -27,11 +27,12 @@ Event = namedtuple('Event', [
 
 class StatisticAnalyzer(object):
 
-    def __init__(self, file_path, outfile_path):
+    def __init__(self, file_path, outfile_path, step):
         self.file_path = file_path
         self.outfile_path = outfile_path
         self.event_types = defaultdict(lambda: SortedList())
         self.event_stats = {}
+        self.table_step = step
 
     def run(self):
         print('Parsing file..')
@@ -110,7 +111,7 @@ class StatisticAnalyzer(object):
 
                 table = BeautifulTable()
                 table.set_style(BeautifulTable.STYLE_BOX)
-                step = 5
+                step = self.table_step
                 table.numeric_precision = 5
                 table.column_headers = results_table_headers
                 for header in results_table_headers:
@@ -139,8 +140,9 @@ class StatisticAnalyzer(object):
 @click.option('--in-file', help='Path to file', required=True)
 @click.option('--out-file', help='Path to an output file',
               default='result.txt')
-def main(in_file, out_file):
-    f = StatisticAnalyzer(in_file, out_file)
+@click.option('--step', help='Step for results table', default=5)
+def main(in_file, out_file, step):
+    f = StatisticAnalyzer(in_file, out_file, step)
     f.run()
 
 
