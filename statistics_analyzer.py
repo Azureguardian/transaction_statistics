@@ -35,10 +35,10 @@ class StatisticAnalyzer(object):
         self.table_step = step
 
     def run(self):
-        print('Parsing file..')
+        print('Parsing file: %s' % self.file_path)
         self._parse_file()
         self._process_arrays()
-        print('Writing results to: %s..' % self.outfile_path)
+        print('Writing results to: %s' % self.outfile_path)
         self._output_to_file()
         print('Finished.')
 
@@ -116,9 +116,13 @@ class StatisticAnalyzer(object):
                 table.column_headers = results_table_headers
                 for header in results_table_headers:
                     table.column_alignments[header] = BeautifulTable.ALIGN_RIGHT
-                for response_time in range(
-                        0, self.event_types[event][-1] + step, step):
-                    count = self.event_types[event].count(response_time)
+
+                array = self.event_types[event]
+                for response_time in range(0, array[-1] + step, step):
+                    # Находим кол-во транзакций по формуле
+                    # EXECTIME[i-1] < t <= EXECTIME[i]
+                    count = (array.bisect_right(response_time) -
+                             array.bisect_left(response_time - step + 1))
                     if count != 0:
                         # скорее всего, под значением в последнем столбце
                         # имеется в виду процентная группа - "percentile"
@@ -126,10 +130,9 @@ class StatisticAnalyzer(object):
                             [
                                 response_time,
                                 count,
-                                count * 100 / len(self.event_types[event]),
-                                ((self.event_types[event].bisect_right(
-                                    response_time) - 1) /
-                                 len(self.event_types[event]) * 100)
+                                count * 100 / len(array),
+                                ((array.bisect_right(
+                                    response_time) - 1) / len(array) * 100)
                             ]
                         )
                 file.write(str(table))
